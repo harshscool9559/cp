@@ -1,0 +1,130 @@
+#include<bits/stdc++.h>
+using namespace std;
+#define int long long
+const int MOD = 1e9 + 7;
+const int INF = LLONG_MAX >> 1;
+int power(int x, unsigned int y)
+{
+    int res = 1; // Initialize result
+ 
+    while (y > 0) {
+        // If y is odd, multiply x with result
+        if (y & 1)
+            res = res * x;
+ 
+        // y must be even now
+        y = y >> 1; // y = y/2
+        x = x * x; // Change x to x^2
+    }
+    return res;
+}
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+};
+
+TreeNode* buildTree(const vector<string>& nodes) {
+    if (nodes.empty() || nodes[0] == "null") return nullptr;
+
+    TreeNode *root = new TreeNode(stoi(nodes[0]));
+    queue<TreeNode*> q;
+    q.push(root);
+    size_t i = 1;
+
+    while (!q.empty() && i < nodes.size()) {
+        TreeNode *current = q.front();
+        q.pop();
+
+        if (nodes[i] != "null") {
+            current->left = new TreeNode(stoi(nodes[i]));
+            q.push(current->left);
+        }
+        ++i;
+
+        if (i < nodes.size() && nodes[i] != "null") {
+            current->right = new TreeNode(stoi(nodes[i]));
+            q.push(current->right);
+        }
+        ++i;
+    }
+    return root;
+}
+
+void printTree(TreeNode* root) {
+    if (!root) return;
+
+    queue<TreeNode*> q;
+    q.push(root);
+
+    while (!q.empty()) {
+        TreeNode *current = q.front();
+        q.pop();
+        
+        if (current) {
+            cout << current->val << " ";
+            if (current->left || current->right) {
+                q.push(current->left);
+                q.push(current->right);
+            }
+        } else {
+            cout << "null ";
+        }
+    }
+    cout << endl;
+}
+bool findPath(TreeNode* root, vector<int>& path, int k)
+{
+    if (root == NULL)
+        return false;
+    path.push_back(root->val);
+    if (root->val == k)
+        return true;
+    if ((root->left && findPath(root->left, path, k))
+        || (root->right && findPath(root->right, path, k)))
+        return true;
+    path.pop_back();
+    return false;
+}
+int findLCA(TreeNode* root, int n1, int n2)
+{
+    vector<int> path1, path2;
+    if (!findPath(root, path1, n1)
+        || !findPath(root, path2, n2))
+        return -1;
+    int i;
+    for (i = 0; i < path1.size() && i < path2.size(); i++)
+        if (path1[i] != path2[i])
+            break;
+    return path1[i - 1];
+}
+signed main()
+ { 
+ios::sync_with_stdio(false); 
+cin.tie(NULL);
+ string input;
+    getline(cin, input);
+    vector<string> nodes;
+    string temp = "";
+    for (char c : input) {
+        if (c == ' ') {
+            nodes.push_back(temp);
+            temp = "";
+        } else {
+            temp += c;
+        }
+    }
+    if (!temp.empty()) {
+        nodes.push_back(temp);
+    }
+
+    TreeNode* root = buildTree(nodes);
+
+    int p,q;
+    cin>>p>>q;
+  cout<< findLCA(root, p, q);
+
+    return 0;
+}
+
